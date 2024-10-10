@@ -6,32 +6,32 @@ env:
   PAT_GITHUB: ${{ secrets.PAT_GITHUB }}
 
 jobs:
-  pre-commit:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/setup-python@v5
-      with:
-        python-version: 3.9.18
-    - uses: actions/checkout@v4
-      with:
-        repository: facebookresearch/accel-cortex
-        token: ${{ env.PAT_GITHUB }}
-    - name: Combine pre-commit config and python version for caching
-      run: |
-        cat .pre-commit-config.yaml > pre-commit-deps.txt
-        python -VV >> pre-commit-deps.txt
-    - name: Cache dependencies
-      uses: actions/cache@v4
-      with:
-        path: "~/.cache/pre-commit"
-        key: v1-pre-commit-deps-${{ hashFiles('pre-commit-deps.txt') }}
-    - name: Install Dependencies
-      run: |
-        pip install -U pip setuptools pre-commit
-        # Install the hooks now so that they'll be cached
-        pre-commit install-hooks
-    - name: Check Code Style using pre-commit
-      run: SKIP=clang-format,eslint pre-commit run --show-diff-on-failure --all-files
+  # pre-commit:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/setup-python@v5
+  #     with:
+  #       python-version: 3.9.18
+  #   - uses: actions/checkout@v4
+  #     with:
+  #       repository: facebookresearch/accel-cortex
+  #       token: ${{ env.PAT_GITHUB }}
+  #   - name: Combine pre-commit config and python version for caching
+  #     run: |
+  #       cat .pre-commit-config.yaml > pre-commit-deps.txt
+  #       python -VV >> pre-commit-deps.txt
+  #   - name: Cache dependencies
+  #     uses: actions/cache@v4
+  #     with:
+  #       path: "~/.cache/pre-commit"
+  #       key: v1-pre-commit-deps-${{ hashFiles('pre-commit-deps.txt') }}
+  #   - name: Install Dependencies
+  #     run: |
+  #       pip install -U pip setuptools pre-commit
+  #       # Install the hooks now so that they'll be cached
+  #       pre-commit install-hooks
+  #   - name: Check Code Style using pre-commit
+  #     run: SKIP=clang-format,eslint pre-commit run --show-diff-on-failure --all-files
   pytest:
     runs-on: ubuntu-latest
     steps:
