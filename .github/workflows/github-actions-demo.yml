@@ -15,7 +15,6 @@ jobs:
     - uses: actions/checkout@v4
       with:
         repository: facebookresearch/accel-cortex
-        ref: m2f_new_config
         token: ${{ env.PAT_GITHUB }}
     - name: Combine pre-commit config and python version for caching
       run: |
