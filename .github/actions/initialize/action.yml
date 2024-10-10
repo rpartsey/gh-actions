@@ -18,8 +18,8 @@ runs:
       echo "List Home Directory (ls ~):"
       ls ~
 
-      echo "which conda"
-      which conda
+      echo "conda:"
+      conda env list
 
       
     shell: bash
