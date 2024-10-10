@@ -17,6 +17,11 @@ runs:
       
       echo "List Home Directory (ls ~):"
       ls ~
+
+      echo "which conda"
+      which conda
+
+      
     shell: bash
   # - name: Delete extraneous circleci environment file
   #   run: rm -rf ~/.circlerc
