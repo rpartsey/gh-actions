@@ -9,8 +9,13 @@ runs:
     shell: bash
   - name: Echo useful info
     run: |
+      echo "Current Directory (pwd):"
       pwd
+      
+      echo "List Current Directory (ls .):"
       ls .
+      
+      echo "List Home Directory (ls ~):"
       ls ~
     shell: bash
   # - name: Delete extraneous circleci environment file
