@@ -6,7 +6,11 @@ runs:
     run: |
       # Use the first day of the current month
       echo $(date +%Y-%m-01) > ~/date_stamp.txt
-    shell: bash
+  - name: Echo useful info
+    run: |
+      pwd
+      ls .
+      ls ~
   # - name: Delete extraneous circleci environment file
   #   run: rm -rf ~/.circlerc
   #   shell: bash
