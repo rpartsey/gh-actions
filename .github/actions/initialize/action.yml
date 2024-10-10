@@ -24,6 +24,9 @@ runs:
       echo "conda:"
       echo ${CONDA}
 
+      echo "ls conda"
+      ls ${CONDA}
+
       
     shell: bash
   # - name: Delete extraneous circleci environment file
