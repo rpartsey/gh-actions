@@ -45,14 +45,9 @@ jobs:
         environment-file: environment.yml
         cache-environment: true
         cache-environment-key: cache-environment-key-v1
-        init-shell: bash
     - name: Continue environment initialization 
-      run:
-        which python
-      shell: bash -el {0}
-
-    - name: Continue environment initialization 2
-      run:
+      run: |
+        mamba activate accel-cortex
         which python
         
     # - uses: "./.github/actions/initialize"
