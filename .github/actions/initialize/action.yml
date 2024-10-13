@@ -2,39 +2,39 @@ name: initialize
 runs:
   using: composite
   steps:
-  - name: Install system dependencies
-    run: |
-      sudo apt-get update || true
-      sudo apt-get install -y --no-install-recommends \
-          build-essential \
-          git \
-          curl \
-          vim \
-          ca-certificates \
-          libbullet-dev \
-          libjpeg-dev \
-          libglm-dev \
-          libegl1-mesa-dev \
-          xorg-dev \
-          freeglut3-dev \
-          pkg-config \
-          wget \
-          zip \
-          libhdf5-dev \
-          unzip || true
-    shell: bash
+  # - name: Install system dependencies
+  #   run: |
+  #     sudo apt-get update || true
+  #     sudo apt-get install -y --no-install-recommends \
+  #         build-essential \
+  #         git \
+  #         curl \
+  #         vim \
+  #         ca-certificates \
+  #         libbullet-dev \
+  #         libjpeg-dev \
+  #         libglm-dev \
+  #         libegl1-mesa-dev \
+  #         xorg-dev \
+  #         freeglut3-dev \
+  #         pkg-config \
+  #         wget \
+  #         zip \
+  #         libhdf5-dev \
+  #         unzip || true
+  #   shell: bash
 
-  - name: Download MobileSAM model
-    run: |
-      mkdir -p $HOME/.cache/mobile_sam_model
-      if [ ! -f $HOME/.cache/mobile_sam_model/mobile_sam.pt ]; then
-        echo "Downloading MobileSAM model"
-        wget https://github.com/ChaoningZhang/MobileSAM/raw/a509aac54fdd7af59f843135f2f7cee307283c88/weights/mobile_sam.pt --output-document=$HOME/.cache/mobile_sam_model/mobile_sam.pt
-      else
-        echo "Using cached MobileSAM model"
-        cp $HOME/.cache/mobile_sam_model/mobile_sam.pt cortex/utils/pointcloud/mobile_sam_weights/mobile_sam.pt
-      fi
-    shell: bash
+  # - name: Download MobileSAM weights
+  #   run: |
+  #     mkdir -p $HOME/.cache/mobile_sam_model
+  #     if [ ! -f $HOME/.cache/mobile_sam_model/mobile_sam.pt ]; then
+  #       echo "Downloading MobileSAM weights"
+  #       wget https://github.com/ChaoningZhang/MobileSAM/raw/a509aac54fdd7af59f843135f2f7cee307283c88/weights/mobile_sam.pt --output-document=$HOME/.cache/mobile_sam_model/mobile_sam.pt
+  #     else
+  #       echo "Using cached MobileSAM weights"
+  #       cp $HOME/.cache/mobile_sam_model/mobile_sam.pt cortex/utils/pointcloud/mobile_sam_weights/mobile_sam.pt
+  #     fi
+  #   shell: bash
   
   # - name: Create date stamp for the beginning of the month
   #   run: |
@@ -48,123 +48,99 @@ runs:
   #   with:
   #     path: $CONDA/envs
   #     key: conda-env-${{ hashFiles('.github/**.yml') }}-${{ hashFiles('environment.yml') }}-${{ hashFiles('requirements.txt') }}-${{ hashFiles('~/date_stamp.txt') }}
-  
-  # - name: Install Miniconda3
-  #   run: |-
-  #     if [ ! -d ~/miniconda3 ]; then
-  #       echo "Installing Miniconda3"
-  #       wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
-  #       /bin/bash ~/miniconda.sh -b -p ~/miniconda3
-  #       rm ~/miniconda.sh
-  #     fi
-  #     echo "Initializing Miniconda3"
-  #     sudo ln -s ~/miniconda3/etc/profile.d/conda.sh /etc/profile.d/conda.sh
-  #     . ~/miniconda3/etc/profile.d/conda.sh
-  #   shell: bash
 
-  - name: Instal mamba
-    # if: steps.cache-conda-envs.outputs.cache-hit != 'true'
-    run: conda install -y -c conda-forge mamba=1.5.6 -n base
+  - uses: mamba-org/setup-micromamba@v2
+    with:
+      micromamba-version: '1.5.6-0'
+      environment-file: environment.yml
+      init-shell: bash
     shell: bash
 
-  - name: Create conda environment
+  - name: Continue environment initialization 
     run: |
-      if conda env list | grep accel-cortex; then
-        echo "Found existing environment"
-        # Need to install for creation of the data directory
-        git submodule update --init submodules/home_robot/
-        ln -s submodules/home_robot/data data
-      else
-        echo "Creating new environment"
-        mamba env create --file environment.yml
-        conda activate accel-cortex
-        pip install --upgrade pip
+      whuch python
+      pip install --upgrade pip
+      # pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cu118
+      # pip install torch-cluster==1.6.1 -f https://data.pyg.org/whl/torch-2.0.1+cu118.html
+      # pip install "git+https://github.com/facebookresearch/pytorch3d.git@v0.7.4"
+      # pip install -r requirements.txt
 
-        pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cu118
-        pip install torch-cluster==1.6.1 -f https://data.pyg.org/whl/torch-2.0.1+cu118.html
-        pip install "git+https://github.com/facebookresearch/pytorch3d.git@v0.7.4"
-        pip install -r requirements.txt
+      # pip install spconv-cu113
+      # # install PonderV2 dependencies
+      # cd pretrain
+      # # NeuS renderer
+      # cd libs/smooth-sampler
+      # # e.g. 7.0: V100; 7.5: RTX 3000; 8.0: a100 More available in: https://developer.nvidia.com/cuda-gpus
+      # # So on AWS, it should be "8.0"
+      # TORCH_CUDA_ARCH_LIST="7.5" python setup.py install
+      # cd ../..
+      # # pointops
+      # cd libs/pointops
+      # python setup.py install
+      # cd ../../..
 
+      # # Added for speed up:
+      # git submodule sync
+      # git submodule update --init || true
+      # git submodule update --init submodules/home_robot/
+      # git submodule update --init submodules/open_eqa/
+      # git submodule update --init --recursive submodules/gsplat/
+      # git submodule update --init --recursive submodules/pytorch-msssim/
+      # git submodule foreach git reset --hard
 
-        pip install spconv-cu113
-        # install PonderV2 dependencies
-        cd pretrain
-        # NeuS renderer
-        cd libs/smooth-sampler
-        # e.g. 7.0: V100; 7.5: RTX 3000; 8.0: a100 More available in: https://developer.nvidia.com/cuda-gpus
-        # So on AWS, it should be "8.0"
-        TORCH_CUDA_ARCH_LIST="7.5" python setup.py install
-        cd ../..
-        # pointops
-        cd libs/pointops
-        python setup.py install
-        cd ../../..
+      # pip install -e submodules/home_robot/src/home_robot
+      # pip install -e submodules/home_robot/src/home_robot_sim
+      # pip install -e submodules/open_eqa/
+      # pip install -e submodules/gsplat
+      # pip install -e submodules/pytorch-msssim
 
+      # export ACCEL_CORTEX=/home/circleci/project
+      # export LLM_MM_PATH=/home/circleci/project/LLM_MM_aligner/
+      # export HOME_ROBOT_ROOT=/home/circleci/project/submodules/home_robot
+      # export PYTHONPATH=$PYTHONPATH:$HOME_ROBOT_ROOT/projects/habitat_ovmm/
 
-        # Added for speed up:
-        git submodule sync
-        git submodule update --init || true
-        git submodule update --init submodules/home_robot/
-        git submodule update --init submodules/open_eqa/
-        git submodule update --init --recursive submodules/gsplat/
-        git submodule update --init --recursive submodules/pytorch-msssim/
-        git submodule foreach git reset --hard
+      # ln -s submodules/home_robot/data data
 
-        pip install -e submodules/home_robot/src/home_robot
-        pip install -e submodules/home_robot/src/home_robot_sim
-        pip install -e submodules/open_eqa/
-        pip install -e submodules/gsplat
-        pip install -e submodules/pytorch-msssim
+      # pip install hydra_zen
+      # pip install -r LLM_MM_aligner/requirement.txt
+      # pip install kornia
+      # # cd /home/circleci/project/LLM_MM_aligner
+      # # git checkout cortex/main
+      # # cd ../..
 
+      # # cd /home/circleci/project/submodules/home_robot
+      # # git checkout pmcvay/demo-refactor
+      # # cd ../..
 
-        export ACCEL_CORTEX=/home/circleci/project
-        export LLM_MM_PATH=/home/circleci/project/LLM_MM_aligner/
-        export HOME_ROBOT_ROOT=/home/circleci/project/submodules/home_robot
-        export PYTHONPATH=$PYTHONPATH:$HOME_ROBOT_ROOT/projects/habitat_ovmm/
+      # cd submodules/home_robot/
+      # git submodule sync && git submodule update --init src/third_party/habitat-lab
+      # pip install -e src/third_party/habitat-lab/habitat-lab/
+      # pip install -e src/third_party/habitat-lab/habitat-baselines/
+      # echo "Install detectron2..."
+      # git submodule update --init --recursive src/third_party/detectron2
+      # cd $HOME_ROBOT_ROOT
+      # pip install -e src/third_party/detectron2
+      # git submodule update --init --recursive src/home_robot/home_robot/perception/detection/detic/Detic
+      # cd src/home_robot/home_robot/perception/detection/detic/Detic
+      # pip install -r requirements.txt
+      # mkdir models
+      # wget https://dl.fbaipublicfiles.com/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth -O models/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth
+      # cd /home/circleci/project
 
-        ln -s submodules/home_robot/data data
+      # pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cu118
+      # pip uninstall torch-cluster -y
+      # pip install torch-cluster
 
-        pip install hydra_zen
-        pip install -r LLM_MM_aligner/requirement.txt
-        pip install kornia
-        # cd /home/circleci/project/LLM_MM_aligner
-        # git checkout cortex/main
-        # cd ../..
+      # pip uninstall pytorch3d  -y
+      # pip install "git+https://github.com/facebookresearch/pytorch3d.git@v0.7.4"
 
-        # cd /home/circleci/project/submodules/home_robot
-        # git checkout pmcvay/demo-refactor
-        # cd ../..
+      # pip uninstall sophus -y
+      # pip uninstall sophuspy -y
+      # pip install sophuspy==0.0.8
+      # pip install albumentations==1.1.0
+      # pip install natsort==8.4.0
 
-        cd submodules/home_robot/
-        git submodule sync && git submodule update --init src/third_party/habitat-lab
-        pip install -e src/third_party/habitat-lab/habitat-lab/
-        pip install -e src/third_party/habitat-lab/habitat-baselines/
-        echo "Install detectron2..."
-        git submodule update --init --recursive src/third_party/detectron2
-        cd $HOME_ROBOT_ROOT
-        pip install -e src/third_party/detectron2
-        git submodule update --init --recursive src/home_robot/home_robot/perception/detection/detic/Detic
-        cd src/home_robot/home_robot/perception/detection/detic/Detic
-        pip install -r requirements.txt
-        mkdir models
-        wget https://dl.fbaipublicfiles.com/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth -O models/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth
-        cd /home/circleci/project
-
-        pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cu118
-        pip uninstall torch-cluster -y
-        pip install torch-cluster
-
-        pip uninstall pytorch3d  -y
-        pip install "git+https://github.com/facebookresearch/pytorch3d.git@v0.7.4"
-
-        pip uninstall sophus -y
-        pip uninstall sophuspy -y
-        pip install sophuspy==0.0.8
-        pip install albumentations==1.1.0
-        pip install natsort==8.4.0
-
-        echo "Done! :)"
-      fi
+      echo "Done! :)"
     shell: bash
   
   # - name: restore_cache
