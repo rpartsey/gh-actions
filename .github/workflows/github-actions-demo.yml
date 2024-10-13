@@ -50,6 +50,11 @@ jobs:
       run:
         which python
       shell: bash -el {0}
+
+    - name: Continue environment initialization 2
+      run:
+        which python
+      shell: bash -el {0}
         
     # - uses: "./.github/actions/initialize"
     # - name: run pytest
