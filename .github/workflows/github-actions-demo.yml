@@ -49,6 +49,7 @@ jobs:
       run: |
         micromamba activate accel-cortex
         which python
+      shell: bash -el {0}
         
     # - uses: "./.github/actions/initialize"
     # - name: run pytest
