@@ -43,10 +43,12 @@ jobs:
       with:
         micromamba-version: '1.5.6-0'
         environment-file: environment.yml
+        cache-environment: true
+        cache-environment-key: cache-environment-key-v1
         init-shell: bash
     - name: Continue environment initialization 
       run: |
-        whuch python
+        which python
         pip install --upgrade pip
         
     # - uses: "./.github/actions/initialize"
