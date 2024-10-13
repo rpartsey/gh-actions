@@ -49,7 +49,7 @@ jobs:
     - name: Continue environment initialization 
       run: |
         which python
-        pip list
+        micromamba info | grep -q "environment : accel-cortex"
         
     # - uses: "./.github/actions/initialize"
     # - name: run pytest
