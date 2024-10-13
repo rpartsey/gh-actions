@@ -39,7 +39,18 @@ jobs:
       with:
         repository: facebookresearch/accel-cortex
         token: ${{ env.PAT_GITHUB }}
-    - uses: "./.github/actions/initialize"
+
+    - uses: mamba-org/setup-micromamba@v2
+      with:
+        micromamba-version: '1.5.6-0'
+        environment-file: environment.yml
+        init-shell: bash
+
+    - name: Continue environment initialization 
+      run: |
+        whuch python
+        pip install --upgrade pip
+
     # - name: run pytest
     #   run: ". ~/miniconda3/bin/activate\nconda activate accel-cortex\n\n# Build C++ part of the Cortex, reruning might be needed\ncd cortex/cpp;./build.sh; cd ../..\n\ngit submodule sync\ngit submodule update --init || true\ngit submodule update --init submodules/home_robot/\ngit submodule update --init submodules/open_eqa/\ngit submodule update --init --recursive submodules/gsplat/\ngit submodule update --init --recursive submodules/pytorch-msssim/\ngit submodule foreach git reset --hard\n\npip install -e submodules/home_robot/src/home_robot\npip install -e submodules/home_robot/src/home_robot_sim\npip install -e submodules/open_eqa/\npip install -e submodules/gsplat\npip install -e submodules/pytorch-msssim\n\n# pip uninstall torch-cluster -y\n# pip install torch-cluster\n\n# pip uninstall pytorch3d  -y\n# pip install \"git+https://github.com/facebookresearch/pytorch3d.git@v0.7.4\"\n\n\nexport ACCEL_CORTEX=/home/circleci/project\nexport LLM_MM_PATH=/home/circleci/project/LLM_MM_aligner/\nexport HOME_ROBOT_ROOT=/home/circleci/project/submodules/home_robot\nexport PYTHONPATH=$PYTHONPATH:$HOME_ROBOT_ROOT/projects/habitat_ovmm/\nexport HYDRA_FULL_ERROR=1\n\n# ln -s submodules/home_robot/data data\n\npip install hydra_zen\n\ncd submodules/home_robot/\ngit submodule sync && git submodule update --init src/third_party/habitat-lab\npip install -e src/third_party/habitat-lab/habitat-lab/\npip install -e src/third_party/habitat-lab/habitat-baselines/\necho \"Install detectron2...\"\ngit submodule update --init --recursive src/third_party/detectron2\ncd $HOME_ROBOT_ROOT\npip install -e src/third_party/detectron2\ngit submodule update --init --recursive src/home_robot/home_robot/perception/detection/detic/Detic\ncd src/home_robot/home_robot/perception/detection/detic/Detic\npip install -r requirements.txt\nmkdir models || true\nwget https://dl.fbaipublicfiles.com/detic/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth -O models/Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth\ncd $HOME/project\n\n\n# offline eqa dataset test requirements\npip uninstall -y openai\npip install openai\n\n# tests/test_refexp_dataset.py::test_transform requires seaborn\npip install seaborn\n\n# tests/test_multi_dataset_dataloader.py needs reinstalling scipy and kiwisolver\npip uninstall -y scipy kiwisolver\npip install scipy==1.11.3 kiwisolver==1.4.5\n\npython -m pytest --junitxml=test-results/junit.xml --cov-report=html:cov_html --cov=cortex tests/ --ignore=tests/test_llm_mm_align_agent.py\n\necho \"pytest finished! \U0001F389\""
     # - uses: actions/upload-artifact@v4.1.0
