@@ -54,7 +54,6 @@ runs:
       micromamba-version: '1.5.6-0'
       environment-file: environment.yml
       init-shell: bash
-    shell: bash
 
   - name: Continue environment initialization 
     run: |
