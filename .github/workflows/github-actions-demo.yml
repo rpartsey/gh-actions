@@ -47,9 +47,9 @@ jobs:
         cache-environment-key: cache-environment-key-v1
         init-shell: bash
     - name: Continue environment initialization 
-      run: |
+      run:
         which python
-        micromamba info | grep -q "environment : accel-cortex"
+      shell: bash -el {0}
         
     # - uses: "./.github/actions/initialize"
     # - name: run pytest
