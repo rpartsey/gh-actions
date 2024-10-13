@@ -49,7 +49,7 @@ jobs:
     - name: Continue environment initialization 
       run: |
         which python
-        pip install --upgrade pip
+        pip list
         
     # - uses: "./.github/actions/initialize"
     # - name: run pytest
