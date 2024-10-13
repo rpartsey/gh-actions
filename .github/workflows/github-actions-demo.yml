@@ -47,7 +47,7 @@ jobs:
         cache-environment-key: cache-environment-key-v1
     - name: Continue environment initialization 
       run: |
-        mamba activate accel-cortex
+        micromamba activate accel-cortex
         which python
         
     # - uses: "./.github/actions/initialize"
